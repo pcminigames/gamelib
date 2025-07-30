@@ -4,5 +4,4 @@ main: "com.pythoncraft.gamelib.GameLib"
 api-version: "1.21"
 authors: [pythoncraft]
 description: "A library for game development in Minecraft"
-version: 1.0
-api-version: 1.20
+load: STARTUP
