@@ -1,4 +1,4 @@
-package gamelib.gui;
+package com.pythoncraft.gamelib.gui;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.inventory.InventoryClickEvent;

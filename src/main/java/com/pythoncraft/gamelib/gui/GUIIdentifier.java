@@ -1,4 +1,4 @@
-package gamelib.gui;
+package com.pythoncraft.gamelib.gui;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 

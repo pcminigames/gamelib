@@ -1,4 +1,4 @@
-package gamelib.gui;
+package com.pythoncraft.gamelib.gui;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;

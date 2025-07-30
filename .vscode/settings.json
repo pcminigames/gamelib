@@ -1,0 +1,4 @@
+{
+    "mc-color.version": "java",
+    "java.compile.nullAnalysis.mode": "automatic"
+}
