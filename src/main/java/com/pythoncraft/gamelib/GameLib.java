@@ -31,4 +31,16 @@ public class GameLib extends JavaPlugin {
             }
         }
     }
+
+    public static void forceLoadChunkStop(World world, int x, int z) {
+        world.getChunkAt(x, z).removePluginChunkTicket(GameLib.getInstance());
+    }
+
+    public static void forceLoadChunkStop(World world, int x, int z, int radius) {
+        for (int dx = -radius; dx <= radius; dx++) {
+            for (int dz = -radius; dz <= radius; dz++) {
+                forceLoadChunkStop(world, x + dx, z + dz);
+            }
+        }
+    }
 }
