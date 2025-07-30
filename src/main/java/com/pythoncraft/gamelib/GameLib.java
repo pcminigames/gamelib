@@ -11,11 +11,11 @@ public class GameLib extends JavaPlugin {
     @Override
     public void onEnable() {
         instance = this;
-        getLogger().info("GameLib is starting up...");
+        Logger.info("GameLib is starting up...");
     }
 
     @Override
     public void onDisable() {
-        getLogger().info("GameLib is shutting down...");
+        Logger.info("GameLib is shutting down...");
     }
 }
