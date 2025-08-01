@@ -1,4 +1,4 @@
-package com.pythoncraft.gamelib;
+package com.pythoncraft.gamelib.inventory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,6 +23,9 @@ import org.bukkit.inventory.meta.trim.TrimMaterial;
 import org.bukkit.inventory.meta.trim.TrimPattern;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+
+import com.pythoncraft.gamelib.Chat;
+import com.pythoncraft.gamelib.Logger;
 
 public class ItemLoader {
     public static List<ItemStack> loadItems(ConfigurationSection itemsSection) {
