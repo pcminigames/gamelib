@@ -3,6 +3,7 @@ package com.pythoncraft.gamelib.inventory;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.function.Predicate;
 
 import javax.annotation.Nullable;
 
@@ -12,6 +13,7 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ArmorMeta;
@@ -25,6 +27,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import com.pythoncraft.gamelib.Chat;
+import com.pythoncraft.gamelib.GameLib;
 import com.pythoncraft.gamelib.Logger;
 
 public class ItemLoader {
@@ -36,40 +39,80 @@ public class ItemLoader {
             Logger.info("Processing key: " + key);
             
             ConfigurationSection itemSection = itemsSection.getConfigurationSection(key);
+            ItemStack itemStack;
             
             if (itemSection == null) {
                 // Short version: `stick * 64`
-                String itemName = itemsSection.getString(key);
-                
-                if (itemName == null || itemName.isEmpty()) {continue;}
-
-                int count = 1;
-                if (itemName.contains("*")) {
-                    String[] parts = itemName.split("\\*");
-                    itemName = parts[0].trim();
-                    count = Integer.parseInt(parts[1].trim());
-                }
-                Material itemMaterial = Material.getMaterial(itemName.toUpperCase());
-                if (itemMaterial == null) {itemMaterial = Material.STICK;}
-                ItemStack itemStack = new ItemStack(itemMaterial);
-                itemStack.setAmount(count);
-                items.add(itemStack);
-
-                Logger.info("Loaded item: " + itemName);
+                itemStack = loadShortItemStack(itemsSection.getString(key));
             } else {
                 // Full version: use loadItemSection method
-                ItemStack itemStack = loadItemSection(itemSection, null);
-                if (itemStack == null) {continue;}
-                
-                items.add(itemStack);
-                Logger.info("Loaded item: " + itemStack.getType().toString());
+                itemStack = loadItemSection(itemSection);
             }
+            
+            if (itemStack == null) {
+                Logger.warn("Failed to load item for key: " + key);
+                continue;
+            }
+
+            items.add(itemStack);
+            Logger.info("Loaded item: " + itemStack.getType().toString());
         }
 
         return items;
     }
 
-    private static ItemStack loadItemSection(ConfigurationSection itemSection, @Nullable ItemStack defaultItem) {
+    public static List<ItemTemplate> loadConditionalItems(ConfigurationSection templatesSection, HashMap<String, Predicate<Player>> conditions) {
+        List<ItemTemplate> templates = new ArrayList<>();
+        if (templatesSection == null) {return templates;}
+
+        for (String itemKey : templatesSection.getKeys(false)) {
+            ItemTemplate template;
+
+            ConfigurationSection itemSection = templatesSection.getConfigurationSection(itemKey);
+            
+            if (itemSection == null) {
+                // Short version: `stick * 64`
+                template = loadShortItemTemplate(templatesSection.getString(itemKey));
+            } else {
+                // Full version
+                template = loadConditionalItemSection(itemSection, conditions);
+            }
+
+            if (template == null) {
+                Logger.warn("Failed to load item template for key: " + itemKey);
+                continue;
+            }
+
+            templates.add(template);
+            Logger.info("Loaded item template: " + itemKey);
+        }
+
+        return templates;
+    }
+
+    public static ItemStack loadShortItemStack(String item) {
+        if (item == null || item.isEmpty()) {return null;}
+
+        int count = 1;
+        if (item.contains("*")) {
+            String[] parts = item.split("\\*");
+            item = parts[0].trim();
+            count = Integer.parseInt(parts[1].trim());
+        }
+        Material itemMaterial = Material.getMaterial(item.toUpperCase());
+        if (itemMaterial == null) {itemMaterial = GameLib.DEFAULT_MATERIAL;}
+        ItemStack itemStack = new ItemStack(itemMaterial);
+        itemStack.setAmount(count);
+
+        return itemStack;
+    }
+
+    public static ItemTemplate loadShortItemTemplate(String item) {
+        return new ItemTemplate(loadShortItemStack(item));
+    }
+
+    // public static ItemStack loadItemSection(ConfigurationSection itemSection, @Nullable ItemStack baseItem) {
+    public static ItemStack loadItemSection(ConfigurationSection itemSection) {
         if (itemSection == null) {return null;}
 
         String itemId = itemSection.getString("id");
@@ -86,11 +129,13 @@ public class ItemLoader {
 
         ItemStack itemStack;
 
-        if (defaultItem != null) {
-            itemStack = defaultItem.clone();
-        } else {
-            itemStack = new ItemStack(itemMaterial);
-        }
+        // if (baseItem != null) {
+        //     itemStack = baseItem.clone();
+        // } else {
+        //     itemStack = new ItemStack(itemMaterial);
+        // }
+
+        itemStack = new ItemStack(itemMaterial);
         ItemMeta itemMeta = itemStack.getItemMeta();
 
         if (itemName != null && !itemName.isEmpty()) {
@@ -193,5 +238,19 @@ public class ItemLoader {
         itemStack.setItemMeta(itemMeta);
 
         return itemStack;
+    }
+
+    public static ItemTemplate loadConditionalItemSection(ConfigurationSection itemSection, HashMap<String, Predicate<Player>> conditions) {
+        if (itemSection == null) {return null;}
+
+        ItemTemplate template = new ItemTemplate();
+
+        ItemStack itemStack = loadItemSection(itemSection);
+        for (String conditionKey : conditions.keySet()) {
+            if (!itemSection.contains(conditionKey)) {continue;}
+            template.addItem(itemStack, conditions.get(conditionKey));
+        }
+
+        return template;
     }
 }
