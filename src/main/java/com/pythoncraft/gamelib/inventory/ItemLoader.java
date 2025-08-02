@@ -5,8 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.function.Predicate;
 
-import javax.annotation.Nullable;
-
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -31,8 +29,8 @@ import com.pythoncraft.gamelib.GameLib;
 import com.pythoncraft.gamelib.Logger;
 
 public class ItemLoader {
-    public static List<ItemStack> loadItems(ConfigurationSection itemsSection) {
-        List<ItemStack> items = new ArrayList<>();
+    public static HashMap<String, ItemStack> loadItemsMap(ConfigurationSection itemsSection) {
+        HashMap<String, ItemStack> items = new HashMap<>();
         if (itemsSection == null) {return items;}
 
         for (String key : itemsSection.getKeys(false)) {
@@ -54,15 +52,19 @@ public class ItemLoader {
                 continue;
             }
 
-            items.add(itemStack);
+            items.put(key, itemStack);
             Logger.info("Loaded item: " + itemStack.getType().toString());
         }
 
         return items;
     }
 
-    public static List<ItemTemplate> loadConditionalItems(ConfigurationSection templatesSection, HashMap<String, Predicate<Player>> conditions) {
-        List<ItemTemplate> templates = new ArrayList<>();
+    public static List<ItemStack> loadItems(ConfigurationSection itemsSection) {
+        return new ArrayList<>(loadItemsMap(itemsSection).values());
+    }
+
+    public static HashMap<String, ItemTemplate> loadConditionalItemsMap(ConfigurationSection templatesSection, HashMap<String, Predicate<Player>> conditions) {
+        HashMap<String, ItemTemplate> templates = new HashMap<>();
         if (templatesSection == null) {return templates;}
 
         for (String itemKey : templatesSection.getKeys(false)) {
@@ -83,11 +85,15 @@ public class ItemLoader {
                 continue;
             }
 
-            templates.add(template);
+            templates.put(itemKey, template);
             Logger.info("Loaded item template: " + itemKey);
         }
 
         return templates;
+    }
+
+    public static List<ItemTemplate> loadConditionalItems(ConfigurationSection templatesSection, HashMap<String, Predicate<Player>> conditions) {
+        return new ArrayList<>(loadConditionalItemsMap(templatesSection, conditions).values());
     }
 
     public static ItemStack loadShortItemStack(String item) {
