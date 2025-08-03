@@ -31,4 +31,18 @@ public class BlockFill {
             }
         }
     }
+
+    public static BlockFill fromString(String pos1, String pos2, String separator, World world, Material material) {
+        String[] pos1Parts = pos1.split(" ");
+        String[] pos2Parts = pos2.split(" ");
+
+        Location loc1 = new Location(world, Double.parseDouble(pos1Parts[0]), Double.parseDouble(pos1Parts[1]), Double.parseDouble(pos1Parts[2]));
+        Location loc2 = new Location(world, Double.parseDouble(pos2Parts[0]), Double.parseDouble(pos2Parts[1]), Double.parseDouble(pos2Parts[2]));
+
+        return new BlockFill(loc1, loc2, material);
+    }
+
+    public static BlockFill fromString(String pos1, String pos2, World world, Material material) {
+        return fromString(pos1, pos2, " ", world, material);
+    }
 }
