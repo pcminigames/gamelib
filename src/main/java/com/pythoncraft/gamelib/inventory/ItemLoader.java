@@ -86,7 +86,7 @@ public class ItemLoader {
             }
 
             templates.put(itemKey, template);
-            Logger.info("Loaded item template: " + itemKey);
+            Logger.info("Loaded item: " + template.getIndexed(0).getType().toString());
         }
 
         return templates;
@@ -117,8 +117,7 @@ public class ItemLoader {
         return new ItemTemplate(loadShortItemStack(item));
     }
 
-    // public static ItemStack loadItemSection(ConfigurationSection itemSection, @Nullable ItemStack baseItem) {
-    public static ItemStack loadItemSection(ConfigurationSection itemSection) {
+    public static ItemStack loadItemSection(ConfigurationSection itemSection, ItemStack baseItem) {
         if (itemSection == null) {return null;}
 
         String itemId = itemSection.getString("id");
@@ -135,13 +134,13 @@ public class ItemLoader {
 
         ItemStack itemStack;
 
-        // if (baseItem != null) {
-        //     itemStack = baseItem.clone();
-        // } else {
-        //     itemStack = new ItemStack(itemMaterial);
-        // }
+        if (baseItem != null) {
+            itemStack = baseItem.clone();
+        } else {
+            itemStack = new ItemStack(itemMaterial);
+        }
 
-        itemStack = new ItemStack(itemMaterial);
+        // itemStack = new ItemStack(itemMaterial);
         ItemMeta itemMeta = itemStack.getItemMeta();
 
         if (itemName != null && !itemName.isEmpty()) {
@@ -195,7 +194,7 @@ public class ItemLoader {
             }
         }
 
-
+        Logger.info("Loading item: {0} - name {1}, count {2}, durability {3}, base item {4}", itemMaterial, itemName, count, durability, baseItem);
 
         for (String enchantment : enchants.keySet()) {
             Enchantment enchant = Enchantment.getByName(enchantment);
@@ -204,7 +203,6 @@ public class ItemLoader {
         }
 
         if (durability != null) {
-
             if (durability == 0) {
                 itemMeta.setUnbreakable(true);
                 itemMeta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
@@ -246,16 +244,24 @@ public class ItemLoader {
         return itemStack;
     }
 
+    public static ItemStack loadItemSection(ConfigurationSection itemSection) {
+        return loadItemSection(itemSection, null);
+    }
+
     public static ItemTemplate loadConditionalItemSection(ConfigurationSection itemSection, HashMap<String, Predicate<Player>> conditions) {
         if (itemSection == null) {return null;}
 
         ItemTemplate template = new ItemTemplate();
-
         ItemStack itemStack = loadItemSection(itemSection);
+        
         for (String conditionKey : conditions.keySet()) {
-            if (!itemSection.contains(conditionKey)) {continue;}
-            template.addItem(itemStack, conditions.get(conditionKey));
+            if (itemSection.contains(conditionKey)) {
+                ItemStack conditionalItemStack = loadItemSection(itemSection.getConfigurationSection(conditionKey), itemStack);
+                template.addItem(conditionalItemStack, conditions.get(conditionKey));
+            }
         }
+        
+        template.addItem(itemStack, player -> true);
 
         return template;
     }
