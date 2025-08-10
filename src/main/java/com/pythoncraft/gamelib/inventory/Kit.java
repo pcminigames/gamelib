@@ -5,6 +5,7 @@ import java.util.HashMap;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
+import com.pythoncraft.gamelib.Logger;
 import com.pythoncraft.gamelib.inventory.order.InventoryOrder;
 
 public class Kit {
@@ -20,8 +21,12 @@ public class Kit {
 
     public void give(Player player, InventoryOrder inventoryOrder) {
         for (String slotName : items.keySet()) {
-            int slot = inventoryOrder.getSlot(slotName);
-            player.getInventory().setItem(slot, items.get(slotName).getFor(player));
+            if (inventoryOrder.hasSlot(slotName)) {
+                int slot = inventoryOrder.getSlot(slotName);
+                player.getInventory().setItem(slot, items.get(slotName).getFor(player));
+            } else {
+                Logger.warn("Slot name '{0}' not found in inventory order '{1}' for player {2}. Skipping item.", slotName, inventoryOrder.name, player.getName());
+            }
         }
     }
 

@@ -6,14 +6,18 @@ import org.bukkit.entity.Player;
 
 public class InventoryOrder {
     public HashMap<String, Integer> slots = new HashMap<>();
+    public String name;
     public static HashMap<String, InventoryOrder> orders = new HashMap<>();
     public static HashMap<String, String> playerOrders = new HashMap<>();
 
-    public InventoryOrder(HashMap<String, Integer> slots) {
+    public InventoryOrder(String name, HashMap<String, Integer> slots) {
+        this.name = name;
         this.slots = slots;
     }
 
-    public InventoryOrder() {}
+    public InventoryOrder(String name) {
+        this.name = name;
+    }
 
     public void addSlot(String slotName, int slotIndex) {
         if (slots.containsKey(slotName)) {
@@ -25,10 +29,14 @@ public class InventoryOrder {
 
     public int getSlot(String slotName) {
         if (!slots.containsKey(slotName)) {
-            throw new IllegalArgumentException("Slot name '" + slotName + "' does not exist in the inventory order.");
+            throw new IllegalArgumentException("Slot name '" + slotName + "' does not exist in the inventory order (" + this.name + "). Available slots: " + slots.keySet());
         }
         
         return slots.get(slotName);
+    }
+    
+    public boolean hasSlot(String slotName) {
+        return slots.containsKey(slotName);
     }
 
     public static InventoryOrder get(String playerName) {
