@@ -1,16 +1,16 @@
 package com.pythoncraft.gamelib;
 
-import java.util.function.Function;
+import java.util.function.Consumer;
 
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class Timer extends BukkitRunnable {
     private int tickTimeLeft; // Infinite time when set to -1
     private final int tickPeriod;
-    private final Function<Integer, Void> onTick;
-    private final Function<Void, Void> onFinish;
+    private final Consumer<Integer> onTick;
+    private final Consumer<Void> onFinish;
 
-    public Timer(int tickTotalTime, int tickPeriod, Function<Integer, Void> onTick, Function<Void, Void> onFinish) {
+    public Timer(int tickTotalTime, int tickPeriod, Consumer<Integer> onTick, Consumer<Void> onFinish) {
         /*
             Create a timer that runs for `tickTotalTime` ticks, calling `onTick` every `tickPeriod` ticks.
             If `tickTotalTime` is -1, the timer will run indefinitely.
@@ -30,7 +30,7 @@ public class Timer extends BukkitRunnable {
         this.tickPeriod = tickPeriod;
     }
 
-    public static Timer loop(int tickPeriod, Function<Integer, Void> onTick) {
+    public static Timer loop(int tickPeriod, Consumer<Integer> onTick) {
         /*
             Create a repeating timer.
             The timer will run indefinitely, calling `onTick` with the current tick count every `tickPeriod` ticks.
@@ -39,7 +39,7 @@ public class Timer extends BukkitRunnable {
         return new Timer(-1, tickPeriod, onTick, null);
     }
 
-    public static Timer after(int tickTime, Function<Void, Void> onFinish) {
+    public static Timer after(int tickTime, Consumer<Void> onFinish) {
         /*
             Create a timer that runs once after `tickTime` ticks.
             The timer will call `onFinish` when it reaches zero.
@@ -50,7 +50,7 @@ public class Timer extends BukkitRunnable {
     @Override
     public void run() {
         if (this.tickTimeLeft == 0) {
-            if (this.onFinish != null) {this.onFinish.apply(null);}
+            if (this.onFinish != null) {this.onFinish.accept(null);}
 
             this.cancel();
             return;
@@ -58,7 +58,7 @@ public class Timer extends BukkitRunnable {
 
         this.tickTimeLeft -= this.tickPeriod;
 
-        if (this.onTick != null) {this.onTick.apply(Math.abs(this.tickTimeLeft) / this.tickPeriod + 1);}
+        if (this.onTick != null) {this.onTick.accept(Math.abs(this.tickTimeLeft) / this.tickPeriod + 1);}
     }
 
     public void start() {
