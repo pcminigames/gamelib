@@ -8,9 +8,9 @@ public class Timer extends BukkitRunnable {
     private int tickTimeLeft; // Infinite time when set to -1
     private final int tickPeriod;
     private final Consumer<Integer> onTick;
-    private final Consumer<Void> onFinish;
+    private final Runnable onFinish;
 
-    public Timer(int tickTotalTime, int tickPeriod, Consumer<Integer> onTick, Consumer<Void> onFinish) {
+    public Timer(int tickTotalTime, int tickPeriod, Consumer<Integer> onTick, Runnable onFinish) {
         /*
             Create a timer that runs for `tickTotalTime` ticks, calling `onTick` every `tickPeriod` ticks.
             If `tickTotalTime` is -1, the timer will run indefinitely.
@@ -39,7 +39,7 @@ public class Timer extends BukkitRunnable {
         return new Timer(-1, tickPeriod, onTick, null);
     }
 
-    public static Timer after(int tickTime, Consumer<Void> onFinish) {
+    public static Timer after(int tickTime, Runnable onFinish) {
         /*
             Create a timer that runs once after `tickTime` ticks.
             The timer will call `onFinish` when it reaches zero.
@@ -50,7 +50,7 @@ public class Timer extends BukkitRunnable {
     @Override
     public void run() {
         if (this.tickTimeLeft == 0) {
-            if (this.onFinish != null) {this.onFinish.accept(null);}
+            if (this.onFinish != null) {this.onFinish.run();}
 
             this.cancel();
             return;
