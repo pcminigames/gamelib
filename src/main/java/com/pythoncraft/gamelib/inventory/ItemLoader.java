@@ -34,7 +34,7 @@ public class ItemLoader {
         if (itemsSection == null) {return items;}
 
         for (String key : itemsSection.getKeys(false)) {
-            Logger.info("Processing key: " + key);
+            // Logger.info("Processing key: " + key);
             
             ConfigurationSection itemSection = itemsSection.getConfigurationSection(key);
             ItemStack itemStack;
@@ -48,12 +48,12 @@ public class ItemLoader {
             }
             
             if (itemStack == null) {
-                Logger.warn("Failed to load item for key: " + key);
+                // Logger.warn("Failed to load item for key: " + key);
                 continue;
             }
 
             items.put(key, itemStack);
-            Logger.info("Loaded item: " + itemStack.getType().toString());
+            // Logger.info("Loaded item: " + itemStack.getType().toString());
         }
 
         return items;
@@ -81,12 +81,12 @@ public class ItemLoader {
             }
 
             if (template == null) {
-                Logger.warn("Failed to load item template for key: " + itemKey);
+                // Logger.warn("Failed to load item template for key: " + itemKey);
                 continue;
             }
 
             templates.put(itemKey, template);
-            Logger.info("Loaded item: " + template.getIndexed(0).getType().toString());
+            // Logger.info("Loaded item: " + template.getIndexed(0).getType().toString());
         }
 
         return templates;
@@ -194,7 +194,7 @@ public class ItemLoader {
             }
         }
 
-        Logger.info("Loading item: {0} - name {1}, count {2}, durability {3}, base item {4}", itemMaterial, itemName, count, durability, baseItem);
+        // Logger.info("Loading item: {0} - name {1}, count {2}, durability {3}, base item {4}", itemMaterial, itemName, count, durability, baseItem);
 
         for (String enchantment : enchants.keySet()) {
             Enchantment enchant = Enchantment.getByName(enchantment);
