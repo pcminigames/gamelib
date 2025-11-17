@@ -6,6 +6,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class Timer extends BukkitRunnable {
     private int tickTimeLeft; // Infinite time when set to -1
+    private int ticksElapsed;
+    private final int tickTotalTime;
     private final int tickPeriod;
     private final Consumer<Integer> onTick;
     private final Runnable onFinish;
@@ -17,6 +19,8 @@ public class Timer extends BukkitRunnable {
             If `tickPeriod` is 0, the timer will not tick.
         */
         this.tickTimeLeft = -1;
+        this.ticksElapsed = 0;
+        this.tickTotalTime = tickTotalTime;
 
         if (tickPeriod <= 0) {throw new IllegalArgumentException("tickPeriod must be greater than 0");}
 
@@ -49,16 +53,25 @@ public class Timer extends BukkitRunnable {
 
     @Override
     public void run() {
-        if (this.tickTimeLeft == 0) {
-            if (this.onFinish != null) {this.onFinish.run();}
+        if (this.tickTimeLeft == -1) {
+            // Infinite timer
+            this.ticksElapsed += this.tickPeriod;
+            if (this.onTick != null) {
+                this.onTick.accept(this.ticksElapsed);
+            }
+        } else {
+            if (this.onTick != null) {
+                this.onTick.accept(this.tickTimeLeft / this.tickPeriod);
+            }
 
-            this.cancel();
-            return;
+            if (this.tickTimeLeft <= 0) {
+                if (this.onFinish != null) {this.onFinish.run();}
+                this.cancel();
+                return;
+            }
+
+            this.tickTimeLeft -= this.tickPeriod;
         }
-
-        this.tickTimeLeft -= this.tickPeriod;
-
-        if (this.onTick != null) {this.onTick.accept(Math.abs(this.tickTimeLeft) / this.tickPeriod + 1);}
     }
 
     public void start() {

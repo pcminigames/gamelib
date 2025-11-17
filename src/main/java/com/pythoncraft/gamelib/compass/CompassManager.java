@@ -98,8 +98,8 @@ public class CompassManager implements Listener {
         int z = loc.getBlockZ();
 
         switch (showCoords) {
-            case ALL ->  player.sendActionBar(Component.text(Chat.c(" §7Tracking §a" + trackedPlayer.getName() + " §7at §f" + x + " " + y + " " + z)));
-            case Y ->    player.sendActionBar(Component.text(Chat.c(" §7Tracking §a" + trackedPlayer.getName() + " §7at §fy " + y)));
+            case ALL ->  Chat.actionBar(player, " §7Tracking §a" + trackedPlayer.getName() + " §7at §f" + x + " " + y + " " + z);
+            case Y ->    Chat.actionBar(player, " §7Tracking §a" + trackedPlayer.getName() + " §7at §fy " + y);
             case NONE -> {}
         }
 

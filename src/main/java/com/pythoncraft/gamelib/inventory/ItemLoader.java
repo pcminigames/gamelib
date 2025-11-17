@@ -170,21 +170,7 @@ public class ItemLoader {
 
         if (itemSection.contains("effects")) {
             var potionEffectsSection = itemSection.getConfigurationSection("effects");
-            if (potionEffectsSection != null) {
-                for (String effectKey : potionEffectsSection.getKeys(false)) {
-                    var effectSection = potionEffectsSection.getConfigurationSection(effectKey);
-                    if (effectSection == null) {continue;}
-
-                    String effectName = (effectKey.matches("^[a-z_]+$")) ? effectKey : effectSection.getString("type");
-                    if (effectName == null || effectName.isEmpty()) {continue;}
-                    int duration = effectSection.getInt("duration", 0);
-                    int amplifier = effectSection.getInt("amplifier", 0);
-                    boolean hide = effectSection.getBoolean("hide", false);
-
-                    PotionEffect effect = new PotionEffect(PotionEffectType.getByName(effectName), duration, amplifier, false, hide);
-                    potionEffects.add(effect);
-                }
-            }
+            potionEffects = loadPotionEffects(potionEffectsSection);
         }
 
         if (itemSection.contains("potion-color")) {
@@ -264,5 +250,27 @@ public class ItemLoader {
         template.addItem(itemStack, player -> true);
 
         return template;
+    }
+
+    public static List<PotionEffect> loadPotionEffects(ConfigurationSection effectsSection) {
+        List<PotionEffect> potionEffects = new ArrayList<>();
+
+        if (effectsSection != null) {
+            for (String effectKey : effectsSection.getKeys(false)) {
+                var effectSection = effectsSection.getConfigurationSection(effectKey);
+                if (effectSection == null) {continue;}
+
+                String effectName = (effectKey.matches("^[a-z_]+$")) ? effectKey : effectSection.getString("type");
+                if (effectName == null || effectName.isEmpty()) {continue;}
+                int duration = effectSection.getInt("duration", 0);
+                int amplifier = effectSection.getInt("amplifier", 0);
+                boolean hide = effectSection.getBoolean("hide", false);
+
+                PotionEffect effect = new PotionEffect(PotionEffectType.getByName(effectName), duration, amplifier, false, hide);
+                potionEffects.add(effect);
+            }
+        }
+        
+        return potionEffects;
     }
 }

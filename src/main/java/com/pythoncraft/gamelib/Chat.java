@@ -1,5 +1,9 @@
 package com.pythoncraft.gamelib;
 
+import org.bukkit.entity.Player;
+
+import net.kyori.adventure.text.Component;
+
 public class Chat {
     public static String BLACK       = "§0";
     public static String DARK_BLUE   = "§1";
@@ -26,5 +30,9 @@ public class Chat {
 
     public static String c(String message) {
         return message.replace("&", "§");
+    }
+
+    public static void actionBar(Player player, String message) {
+        player.sendActionBar(Component.text(c(message)));
     }
 }
