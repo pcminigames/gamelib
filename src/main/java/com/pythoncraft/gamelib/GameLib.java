@@ -3,7 +3,6 @@ package com.pythoncraft.gamelib;
 import java.io.File;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -15,6 +14,8 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
+
+import net.kyori.adventure.text.format.NamedTextColor;
 
 
 public class GameLib extends JavaPlugin {
@@ -47,7 +48,7 @@ public class GameLib extends JavaPlugin {
         ItemMeta meta = itemStack.getItemMeta();
 
         if (displayName != null && !displayName.isEmpty()) {
-            meta.setDisplayName(displayName);
+            meta.displayName(Chat.component(displayName));
         }
 
         itemStack.setItemMeta(meta);
@@ -107,14 +108,13 @@ public class GameLib extends JavaPlugin {
         });
     }
 
-    public static Team createTeam(String id, String displayName, ChatColor color) {
+    public static Team createTeam(String id, String displayName, NamedTextColor color) {
         Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
         Team team = scoreboard.getTeam(id);
         if (team != null) {return team;}
-
         team = scoreboard.registerNewTeam(id);
-        team.setDisplayName(displayName);
-        team.setColor(color);
+        team.displayName(Chat.component(displayName));
+        team.color(color);
         return team;
     }
 }

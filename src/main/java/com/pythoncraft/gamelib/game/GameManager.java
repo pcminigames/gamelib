@@ -4,6 +4,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 
+import java.io.File;
 import java.util.HashSet;
 import java.util.function.BiConsumer;
 
@@ -15,6 +16,7 @@ import org.bukkit.WorldBorder;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
 import com.pythoncraft.gamelib.GameLib;
@@ -56,6 +58,10 @@ public class GameManager implements Listener {
     public Timer timer;
     public World world;
     public BossBar bossbar;
+
+    private File configFile;
+    private FileConfiguration config;
+    private String gameNumberID;
 
     public BiConsumer<Integer, TickEvent> gameTickFunction;;
     public BarColor bossbarColor = BarColor.GREEN;
@@ -117,6 +123,12 @@ public class GameManager implements Listener {
         this.gameTickFunction = gameTickFunction;
     }
 
+    public void setConfig(File configFile, FileConfiguration config, String gameNumberID) {
+        this.configFile = configFile;
+        this.config = config;
+        this.gameNumberID = gameNumberID;
+    }
+
     public void removeBossbar() {
         if (this.bossbar != null) {
             this.bossbar.removeAll();
@@ -134,7 +146,15 @@ public class GameManager implements Listener {
         this.removeBossbar();
         this.bossbar = Bukkit.createBossBar("", this.bossbarColor, this.bossbarStyle);
 
-        // TODO: Update config
+        if (this.config != null && this.gameNumberID != null) {
+            this.config.set(this.gameNumberID + ".lastGame", this.currentGame);
+
+            try {
+                this.config.save(this.configFile);
+            } catch (Exception e) {
+                Logger.error("Could not save game config file: {0}", e.getMessage());
+            }
+        }
 
         this.x = this.nextGame * this.gap;
         this.z = 0;
@@ -332,7 +352,7 @@ public class GameManager implements Listener {
         Location from = event.getFrom();
         Location to = event.getTo();
         if (from.getX() != to.getX() || from.getZ() != to.getZ()) {
-            event.setTo(to.set(from.getX(), to.getY(), from.getZ()));
+            event.setTo(new Location(to.getWorld(), from.getX(), to.getY(), from.getZ(), to.getYaw(), to.getPitch()));
         }
     }
 

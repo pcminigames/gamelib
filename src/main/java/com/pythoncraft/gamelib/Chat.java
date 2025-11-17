@@ -3,6 +3,7 @@ package com.pythoncraft.gamelib;
 import org.bukkit.entity.Player;
 
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
 public class Chat {
     public static String BLACK       = "§0";
@@ -33,6 +34,18 @@ public class Chat {
     }
 
     public static void actionBar(Player player, String message) {
-        player.sendActionBar(Component.text(c(message)));
+        player.sendActionBar(component(message));
+    }
+
+    public static Component component(String message) {
+        return Component.text(c(message));
+    }
+
+    public static String string(Component component) {
+        return PlainTextComponentSerializer.plainText().serialize(component);
+    }
+
+    public static void message(Player player, String message) {
+        player.sendMessage(c(message));
     }
 }

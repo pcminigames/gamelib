@@ -12,12 +12,15 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 
+import com.pythoncraft.gamelib.GameLib;
+
 public class GUIManager implements Listener {
 
 	private static final GUIManager instance = new GUIManager();
 	private final Map<String, GUI> guis = new HashMap<>();
 
 	private GUIManager() {
+		Bukkit.getPluginManager().registerEvents(this, GameLib.getInstance());
 	}
 
 	public void register(String id, boolean recreateWhenOpened, Function<Player, Inventory> createFunction) {

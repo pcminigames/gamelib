@@ -39,8 +39,8 @@ public class TrackingCompass {
             meta.getPersistentDataContainer().remove(isCompassKey);
             meta.getPersistentDataContainer().remove(compassUUIDKey);
             this.compassItem.setItemMeta(meta);
+            this.compassItem.setAmount(0);
         }
-        this.compassItem.setType(Material.AIR);
     }
 
     public ItemStack getItem() {
@@ -61,7 +61,7 @@ public class TrackingCompass {
         ItemStack compass = new ItemStack(Material.COMPASS);
         ItemMeta meta = compass.getItemMeta();
         
-        meta.setDisplayName(Chat.c("§d§lTracking Compass"));
+        meta.displayName(Chat.component("§d§lTracking Compass"));
         meta.getPersistentDataContainer().set(isCompassKey, PersistentDataType.BOOLEAN, true);
         meta.getPersistentDataContainer().set(compassUUIDKey, PersistentDataType.STRING, uuid);
 
@@ -77,5 +77,12 @@ public class TrackingCompass {
         if (meta == null) {return false;}
 
         return meta.getPersistentDataContainer().has(isCompassKey, PersistentDataType.BOOLEAN);
+    }
+
+    public static String getCompassUUID(ItemStack item) {
+        if (!isTrackingCompass(item)) {return null;}
+
+        ItemMeta meta = item.getItemMeta();
+        return meta.getPersistentDataContainer().get(compassUUIDKey, PersistentDataType.STRING);
     }
 }

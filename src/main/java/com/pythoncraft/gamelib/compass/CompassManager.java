@@ -9,18 +9,22 @@ import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.CompassMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 
-import net.kyori.adventure.text.Component;
-
 import com.pythoncraft.gamelib.Chat;
 import com.pythoncraft.gamelib.GameLib;
 import com.pythoncraft.gamelib.Logger;
+import com.pythoncraft.gamelib.PlayerActions;
+import com.pythoncraft.gamelib.gui.GUIClickEvent;
+import com.pythoncraft.gamelib.gui.GUIIdentifier;
+import com.pythoncraft.gamelib.gui.GUIManager;
 
 public class CompassManager implements Listener {
     private static CompassManager instance;
@@ -31,8 +35,37 @@ public class CompassManager implements Listener {
     public CompassManager(ShowCoords showCoords, ShowWhen showWhen) {
         this.showCoords = showCoords;
         this.showWhen = showWhen;
-        GameLib.getInstance().getServer().getPluginManager().registerEvents(this, GameLib.getInstance());
+        
+        // Register events with better error handling
+        try {
+            GameLib gameLib = GameLib.getInstance();
+            if (gameLib != null) {
+                gameLib.getServer().getPluginManager().registerEvents(this, gameLib);
+                Logger.info("CompassManager events registered successfully");
+            } else {
+                Logger.error("Failed to register CompassManager events - GameLib instance is null");
+            }
+        } catch (Exception e) {
+            Logger.error("Error registering CompassManager events: " + e.getMessage());
+        }
+        
         instance = this;
+
+        GUIManager.getInstance().register("compassMenu", true, (player) -> {
+            Inventory inventory = Bukkit.createInventory(new GUIIdentifier("compassMenu"), 27, Chat.component("§lTracking Compass Menu"));
+
+            int i = 0;
+            for (Player p : Bukkit.getOnlinePlayers()) {
+                if (i >= 27 || p == player) continue;
+                if (p == player) {continue;}
+
+                ItemStack head = PlayerActions.getPlayerHead(p);
+                inventory.setItem(i, head);
+                i++;
+            }
+
+            return inventory;
+        });
     }
 
     public CompassManager(ShowCoords showCoords) {this(showCoords, ShowWhen.IN_INVENTORY);}
@@ -147,5 +180,53 @@ public class CompassManager implements Listener {
 
             removeCompass(uuid);
         }
+    }
+
+    @EventHandler
+    public void onRightClick(PlayerInteractEvent event) {
+        Player player = event.getPlayer();
+        ItemStack item = event.getItem();
+
+        if (TrackingCompass.isTrackingCompass(item)) {
+            String uuid = TrackingCompass.getCompassUUID(item);
+            TrackingCompass compass = activeCompasses.get(uuid);
+
+            if (compass != null) {
+                GUIManager.getInstance().open("compassMenu", player);
+                event.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onGUIClick(GUIClickEvent event) {
+        if (!event.getID().equals("compassMenu")) {return;}
+        InventoryClickEvent invEvent = event.getInventoryClickEvent();
+        
+        Player player = (Player) invEvent.getWhoClicked();
+        ItemStack clickedItem = invEvent.getCurrentItem();
+
+        if (clickedItem == null || clickedItem.getType() != Material.PLAYER_HEAD) {return;}
+
+        String trackedName = Chat.string(clickedItem.getItemMeta().displayName());
+        Player trackedPlayer = Bukkit.getPlayerExact(trackedName);
+
+        if (trackedPlayer == null || !trackedPlayer.isOnline()) {
+            Chat.message(player, "§cThat player is not online.");
+            return;
+        }
+
+        ItemStack compassItem = player.getInventory().getItemInMainHand();
+        if (!TrackingCompass.isTrackingCompass(compassItem)) {return;}
+
+        String uuid = TrackingCompass.getCompassUUID(compassItem);
+        TrackingCompass compass = activeCompasses.get(uuid);
+
+        if (compass == null) {return;}
+
+        compass.track(trackedPlayer);
+        Chat.message(player, "§aNow tracking §f" + trackedPlayer.getName() + "§a.");
+
+        player.closeInventory();
     }
 }

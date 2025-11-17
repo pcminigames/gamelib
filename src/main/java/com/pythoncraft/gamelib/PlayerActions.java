@@ -5,9 +5,12 @@ import java.util.List;
 import java.util.function.BiConsumer;
 
 import org.bukkit.GameMode;
+import org.bukkit.Material;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -60,9 +63,12 @@ public class PlayerActions {
     }
 
 
-
     public static void resetHealth(Player player) {
-        player.setHealth(player.getMaxHealth());
+        player.setHealth(getMaxHealth(player));
+    }
+
+    public static double getMaxHealth(Player player) {
+        return player.getAttribute(Attribute.MAX_HEALTH).getValue();
     }
 
     public static void resetHunger(Player player) {
@@ -122,5 +128,14 @@ public class PlayerActions {
         removeEffect(player, PotionEffectType.MINING_FATIGUE);
         removeEffect(player, PotionEffectType.WEAKNESS);
         removeEffect(player, PotionEffectType.SLOWNESS);
+    }
+
+    public static ItemStack getPlayerHead(Player p) {
+        ItemStack head = new ItemStack(Material.PLAYER_HEAD);
+        SkullMeta meta = (SkullMeta) head.getItemMeta();
+        meta.setOwningPlayer(p);
+        meta.displayName(Chat.component(p.getName()));
+        head.setItemMeta(meta);
+        return head;
     }
 }
