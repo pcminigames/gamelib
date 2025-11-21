@@ -123,6 +123,8 @@ public class CompassManager implements Listener {
 
         compassMeta.setLodestoneTracked(false);
         compassMeta.setLodestone(trackedPlayer.getLocation());
+        
+        compass.setItemMeta(compassMeta);
 
         Location loc = trackedPlayer.getLocation();
 

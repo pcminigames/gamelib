@@ -2,6 +2,7 @@ package com.pythoncraft.gamelib.game;
 
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 
 import java.io.File;
@@ -34,6 +35,7 @@ public class GameManager implements Listener {
     public int currentGame = 0;
     public int nextGame = 1;
     public HashSet<String> avoidedBiomes;
+    public boolean gracePeriodPVP = false;
 
     public int borderSize = 400; // 0 means no border
     public int borderDamageAmount = 100;
@@ -95,6 +97,7 @@ public class GameManager implements Listener {
     public void setGameTime(int gameTimeSec) {setGameTime(gameTimeSec, 0, 0);}
 
     public void setBorder(int borderSize, int borderDamageAmount, int borderWarnDistance) {
+        Logger.info("Setting world border size to {0}", borderSize);
         this.borderSize = borderSize;
         this.borderDamageAmount = borderDamageAmount;
         this.borderWarnDistance = borderWarnDistance;
@@ -136,11 +139,11 @@ public class GameManager implements Listener {
         }
     }
 
-    public void startGame(World world) {
-        Logger.info("Starting game preparation. Game time: {0} sec, Prepare time: {1} sec, Grace period: {2} sec.", this.gameTimeSec, this.prepareTimeSec, this.gracePeriodSec);
+    public void startGame(World world, int gameNumber) {
+        Logger.info("Starting a new game");
         this.playersInGame = new HashSet<>(Bukkit.getOnlinePlayers());
         this.world = world;
-        this.currentGame = this.nextGame;
+        this.currentGame = gameNumber;
         this.nextGame = this.findNextGame(world);
 
         this.removeBossbar();
@@ -228,6 +231,10 @@ public class GameManager implements Listener {
 
         Logger.info("Starting prepare timer for {0} seconds.", this.prepareTimeSec);
         this.timer.start();
+    }
+
+    public void startGame(World world) {
+        startGame(world, this.nextGame);
     }
 
     public void gameStarted() {
@@ -365,5 +372,14 @@ public class GameManager implements Listener {
         } else {
             Logger.info("Prepare tick: {0} seconds elapsed.", event.getElapsedSeconds());
         }
+    }
+
+    @EventHandler
+    public void onPlayerAttack(EntityDamageByEntityEvent event) {
+        if (!(event.getDamager() instanceof Player)) {return;}
+        Player damager = (Player) event.getDamager();
+        if (!this.playersInGame.contains(damager)) {return;}
+
+        if (this.isGracePeriod && !this.gracePeriodPVP) {event.setCancelled(true);}
     }
 }
