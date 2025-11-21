@@ -63,7 +63,7 @@ public class GameManager implements Listener {
 
     private File configFile;
     private FileConfiguration config;
-    private String gameNumberID;
+    private String gameNumberLabel;
 
     public BiConsumer<Integer, TickEvent> gameTickFunction;;
     public BarColor bossbarColor = BarColor.GREEN;
@@ -129,7 +129,10 @@ public class GameManager implements Listener {
     public void setConfig(File configFile, FileConfiguration config, String gameNumberID) {
         this.configFile = configFile;
         this.config = config;
-        this.gameNumberID = gameNumberID;
+        this.gameNumberLabel = gameNumberID;
+
+        this.currentGame = config.getInt(gameNumberLabel, 0);
+        this.nextGame = findNextGame(world, this.currentGame + 1);
     }
 
     public void removeBossbar() {
@@ -139,24 +142,23 @@ public class GameManager implements Listener {
         }
     }
 
-    public void startGame(World world, int gameNumber) {
-        Logger.info("Starting a new game");
+    public void startGame(World world) {
+        Logger.info("Starting a new game: {0}", this.currentGame);
         this.playersInGame = new HashSet<>(Bukkit.getOnlinePlayers());
         this.world = world;
-        this.currentGame = gameNumber;
-        this.nextGame = this.findNextGame(world);
+        this.currentGame = this.nextGame;
+        this.nextGame = this.findNextGame(world, this.currentGame + 1);
 
         this.removeBossbar();
         this.bossbar = Bukkit.createBossBar("", this.bossbarColor, this.bossbarStyle);
 
-        if (this.config != null && this.gameNumberID != null) {
-            this.config.set(this.gameNumberID + ".lastGame", this.currentGame);
+        Logger.info("Saving current game number {0} to config file.", this.currentGame);
+        this.config.set(this.gameNumberLabel, this.currentGame);
 
-            try {
-                this.config.save(this.configFile);
-            } catch (Exception e) {
-                Logger.error("Could not save game config file: {0}", e.getMessage());
-            }
+        try {
+            this.config.save(this.configFile);
+        } catch (Exception e) {
+            Logger.error("Could not save game config file: {0}", e.getMessage());
         }
 
         this.x = this.nextGame * this.gap;
@@ -231,10 +233,6 @@ public class GameManager implements Listener {
 
         Logger.info("Starting prepare timer for {0} seconds.", this.prepareTimeSec);
         this.timer.start();
-    }
-
-    public void startGame(World world) {
-        startGame(world, this.nextGame);
     }
 
     public void gameStarted() {

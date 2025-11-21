@@ -36,18 +36,8 @@ public class CompassManager implements Listener {
         this.showCoords = showCoords;
         this.showWhen = showWhen;
         
-        // Register events with better error handling
-        try {
-            GameLib gameLib = GameLib.getInstance();
-            if (gameLib != null) {
-                gameLib.getServer().getPluginManager().registerEvents(this, gameLib);
-                Logger.info("CompassManager events registered successfully");
-            } else {
-                Logger.error("Failed to register CompassManager events - GameLib instance is null");
-            }
-        } catch (Exception e) {
-            Logger.error("Error registering CompassManager events: " + e.getMessage());
-        }
+        GameLib gameLib = GameLib.getInstance();
+        gameLib.getServer().getPluginManager().registerEvents(this, gameLib);
         
         instance = this;
 
@@ -72,13 +62,7 @@ public class CompassManager implements Listener {
 
     public CompassManager() {this(ShowCoords.ALL, ShowWhen.IN_INVENTORY);}
 
-    public static CompassManager getInstance() {
-        if (instance == null) {
-            instance = new CompassManager(ShowCoords.ALL, ShowWhen.IN_INVENTORY);
-        }
-
-        return instance;
-    }
+    public static CompassManager getInstance() {return instance;}
 
     public TrackingCompass createTrackingCompass() {
         TrackingCompass compass = new TrackingCompass();
@@ -173,11 +157,8 @@ public class CompassManager implements Listener {
         ItemStack itemStack = item.getItemStack();
         Player player = event.getPlayer();
 
-        Logger.info("Player {0} dropped an item.", player.getName());
-
         if (TrackingCompass.isTrackingCompass(itemStack)) {
             String uuid = itemStack.getItemMeta().getPersistentDataContainer().get(TrackingCompass.compassUUIDKey, PersistentDataType.STRING);
-            Logger.info("Player {0} dropped a tracking compass ({1}).", player.getName(), uuid);
             item.remove();
 
             removeCompass(uuid);
@@ -189,7 +170,7 @@ public class CompassManager implements Listener {
         Player player = event.getPlayer();
         ItemStack item = event.getItem();
 
-        if (TrackingCompass.isTrackingCompass(item)) {
+        if (TrackingCompass.isTrackingCompass(item) && event.getAction().toString().contains("RIGHT_CLICK")) {
             String uuid = TrackingCompass.getCompassUUID(item);
             TrackingCompass compass = activeCompasses.get(uuid);
 
