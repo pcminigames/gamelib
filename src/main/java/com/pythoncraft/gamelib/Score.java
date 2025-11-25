@@ -13,8 +13,7 @@ public class Score {
         if (scoreboard.getObjective(name) != null) {
             scoreboard.getObjective(name).unregister();
         }
-
-        this.objective = scoreboard.registerNewObjective(name, Criteria.DUMMY, displayName);
+        this.objective = scoreboard.registerNewObjective(name, Criteria.DUMMY, Chat.component(displayName));
     }
 
     public Score(String name) {
@@ -22,7 +21,7 @@ public class Score {
     }
 
     public void setDisplayName(String displayName) {
-        this.objective.setDisplayName(displayName);
+        this.objective.displayName(Chat.component(displayName));
     }
 
     public void setDisplaySlot(DisplaySlot slot) {

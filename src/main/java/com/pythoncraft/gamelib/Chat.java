@@ -1,5 +1,6 @@
 package com.pythoncraft.gamelib;
 
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 
 import net.kyori.adventure.text.Component;
@@ -47,5 +48,17 @@ public class Chat {
 
     public static void message(Player player, String message) {
         player.sendMessage(c(message));
+    }
+
+    public static NamespacedKey namespacedKey(String key, boolean isMinecraftKey) {
+        if (isMinecraftKey) {
+            return NamespacedKey.minecraft(key);
+        } else {
+            return NamespacedKey.fromString(key, GameLib.getInstance());
+        }
+    }
+
+    public static NamespacedKey namespacedKey(String key) {
+        return namespacedKey(key, false);
     }
 }

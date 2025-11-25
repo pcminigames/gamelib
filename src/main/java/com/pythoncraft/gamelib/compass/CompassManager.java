@@ -20,7 +20,6 @@ import org.bukkit.persistence.PersistentDataType;
 
 import com.pythoncraft.gamelib.Chat;
 import com.pythoncraft.gamelib.GameLib;
-import com.pythoncraft.gamelib.Logger;
 import com.pythoncraft.gamelib.PlayerActions;
 import com.pythoncraft.gamelib.gui.GUIClickEvent;
 import com.pythoncraft.gamelib.gui.GUIIdentifier;
@@ -155,7 +154,6 @@ public class CompassManager implements Listener {
     public void onItemDrop(PlayerDropItemEvent event) {
         Item item = event.getItemDrop();
         ItemStack itemStack = item.getItemStack();
-        Player player = event.getPlayer();
 
         if (TrackingCompass.isTrackingCompass(itemStack)) {
             String uuid = itemStack.getItemMeta().getPersistentDataContainer().get(TrackingCompass.compassUUIDKey, PersistentDataType.STRING);

@@ -273,6 +273,10 @@ public class GameManager implements Listener {
         this.isPreparing = false;
         this.isGracePeriod = false;
 
+        if (this.bossbar != null) {
+            this.bossbar.removeAll();
+        }
+
         for (Player player : playersInGame) {
             if (this.onPrepareEnd != null) {
                 this.onPrepareEnd.accept(player, playersInGame);
@@ -378,6 +382,6 @@ public class GameManager implements Listener {
         Player damager = (Player) event.getDamager();
         if (!this.playersInGame.contains(damager)) {return;}
 
-        if (this.isGracePeriod && !this.gracePeriodPVP) {event.setCancelled(true);}
+        if (this.isGracePeriod && !this.gracePeriodPVP && event.getEntity() instanceof Player) {event.setCancelled(true);}
     }
 }

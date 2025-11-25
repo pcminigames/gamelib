@@ -1,11 +1,15 @@
 package com.pythoncraft.gamelib;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.function.BiConsumer;
 
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
+import org.bukkit.advancement.Advancement;
+import org.bukkit.advancement.AdvancementProgress;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -137,5 +141,15 @@ public class PlayerActions {
         meta.displayName(Chat.component(p.getName()));
         head.setItemMeta(meta);
         return head;
+    }
+
+    public static void revokeAllAdvancements(Player player) {
+        Iterator<Advancement> advancements = Bukkit.getServer().advancementIterator();
+
+        while (advancements.hasNext()) {
+            AdvancementProgress progress = player.getAdvancementProgress(advancements.next());
+            for (String s : progress.getAwardedCriteria())
+                progress.revokeCriteria(s);
+        }
     }
 }

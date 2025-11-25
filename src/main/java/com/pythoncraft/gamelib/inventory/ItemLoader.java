@@ -26,7 +26,9 @@ import org.bukkit.potion.PotionEffectType;
 
 import com.pythoncraft.gamelib.Chat;
 import com.pythoncraft.gamelib.GameLib;
-import com.pythoncraft.gamelib.Logger;
+
+import io.papermc.paper.registry.RegistryAccess;
+import io.papermc.paper.registry.RegistryKey;
 
 public class ItemLoader {
     public static HashMap<String, ItemStack> loadItemsMap(ConfigurationSection itemsSection) {
@@ -140,11 +142,10 @@ public class ItemLoader {
             itemStack = new ItemStack(itemMaterial);
         }
 
-        // itemStack = new ItemStack(itemMaterial);
         ItemMeta itemMeta = itemStack.getItemMeta();
 
         if (itemName != null && !itemName.isEmpty()) {
-            itemMeta.setDisplayName(Chat.c(itemName));
+            itemMeta.displayName(Chat.component(itemName));
         }
 
         var enchantments = itemSection.getConfigurationSection("enchantments");
@@ -157,15 +158,14 @@ public class ItemLoader {
         }
 
         if (itemSection.contains("durability")) {durability = itemSection.getInt("durability");}
-
         if (itemSection.contains("trim-material")) {
             String trimMaterialName = itemSection.getString("trim-material").toLowerCase();
-            trimMaterial = Registry.TRIM_MATERIAL.get(NamespacedKey.minecraft(trimMaterialName));
+            trimMaterial = getTrimMaterialByName(trimMaterialName);
         }
 
         if (itemSection.contains("trim-pattern")) {
             String trimPatternName = itemSection.getString("trim-pattern").toLowerCase();
-            trimPattern = Registry.TRIM_PATTERN.get(NamespacedKey.minecraft(trimPatternName));
+            trimPattern = getTrimPatternByName(trimPatternName);
         }
 
         if (itemSection.contains("effects")) {
@@ -183,7 +183,7 @@ public class ItemLoader {
         // Logger.info("Loading item: {0} - name {1}, count {2}, durability {3}, base item {4}", itemMaterial, itemName, count, durability, baseItem);
 
         for (String enchantment : enchants.keySet()) {
-            Enchantment enchant = Enchantment.getByName(enchantment);
+            Enchantment enchant = getEnchantmentByName(enchantment);
             if (enchant == null) {continue;}
             itemMeta.addEnchant(enchant, enchants.get(enchantment), true);
         }
@@ -266,11 +266,35 @@ public class ItemLoader {
                 int amplifier = effectSection.getInt("amplifier", 0);
                 boolean hide = effectSection.getBoolean("hide", false);
 
-                PotionEffect effect = new PotionEffect(PotionEffectType.getByName(effectName), duration, amplifier, false, hide);
+                PotionEffect effect = new PotionEffect(getPotionEffectTypeByName(effectName), duration, amplifier, false, hide);
                 potionEffects.add(effect);
             }
         }
         
         return potionEffects;
+    }
+
+    private static TrimMaterial getTrimMaterialByName(String name) {
+        NamespacedKey key = Chat.namespacedKey(name.toLowerCase());
+        Registry<TrimMaterial> registry = RegistryAccess.registryAccess().getRegistry(RegistryKey.TRIM_MATERIAL);
+        return registry.get(key);
+    }
+
+    private static TrimPattern getTrimPatternByName(String name) {
+        NamespacedKey key = Chat.namespacedKey(name.toLowerCase());
+        Registry<TrimPattern> registry = RegistryAccess.registryAccess().getRegistry(RegistryKey.TRIM_PATTERN);
+        return registry.get(key);
+    }
+
+    private static Enchantment getEnchantmentByName(String name) {
+        NamespacedKey key = Chat.namespacedKey(name.toLowerCase());
+        Registry<Enchantment> registry = RegistryAccess.registryAccess().getRegistry(RegistryKey.ENCHANTMENT);
+        return registry.get(key);
+    }
+
+    private static PotionEffectType getPotionEffectTypeByName(String name) {
+        NamespacedKey key = Chat.namespacedKey(name.toLowerCase());
+        Registry<PotionEffectType> registry = RegistryAccess.registryAccess().getRegistry(RegistryKey.MOB_EFFECT);
+        return registry.get(key);
     }
 }

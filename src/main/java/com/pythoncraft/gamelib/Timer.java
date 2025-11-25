@@ -7,7 +7,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class Timer extends BukkitRunnable {
     private int tickTimeLeft; // Infinite time when set to -1
     private int ticksElapsed;
-    private final int tickTotalTime;
     private final int tickPeriod;
     private final Consumer<Integer> onTick;
     private final Runnable onFinish;
@@ -20,7 +19,6 @@ public class Timer extends BukkitRunnable {
         */
         this.tickTimeLeft = -1;
         this.ticksElapsed = 0;
-        this.tickTotalTime = tickTotalTime;
 
         if (tickPeriod <= 0) {throw new IllegalArgumentException("tickPeriod must be greater than 0");}
 
