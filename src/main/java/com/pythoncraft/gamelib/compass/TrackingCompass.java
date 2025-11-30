@@ -6,6 +6,7 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.CompassMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 
@@ -16,6 +17,7 @@ public class TrackingCompass {
     private Player trackedPlayer;
     private final ItemStack compassItem;
     private final String compassUUID;
+    private final CompassMeta itemMeta;
     public static final NamespacedKey isCompassKey   = new NamespacedKey(GameLib.getInstance(), "tracking-compass");
     public static final NamespacedKey compassUUIDKey = new NamespacedKey(GameLib.getInstance(), "compass-uuid");
 
@@ -23,6 +25,7 @@ public class TrackingCompass {
         this.compassUUID = UUID.randomUUID().toString();
         this.compassItem = createTrackingCompass(this.compassUUID);
         this.trackedPlayer = trackedPlayer;
+        this.itemMeta = (CompassMeta) this.compassItem.getItemMeta();
     }
 
     public TrackingCompass() {this(null);}
@@ -53,6 +56,13 @@ public class TrackingCompass {
 
     public String getCompassUUID() {
         return this.compassUUID;
+    }
+
+    public void updateDirection(Player player) {
+        this.itemMeta.setLodestoneTracked(false);
+        this.itemMeta.setLodestone(trackedPlayer.getLocation());
+        
+        compassItem.setItemMeta(this.itemMeta);
     }
 
     

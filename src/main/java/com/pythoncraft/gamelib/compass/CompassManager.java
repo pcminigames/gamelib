@@ -28,11 +28,12 @@ import com.pythoncraft.gamelib.gui.GUIManager;
 public class CompassManager implements Listener {
     private static CompassManager instance;
     private final HashMap<String, TrackingCompass> activeCompasses = new HashMap<>();
-    private final ShowCoords showCoords;
+    private final String showCoordsPattern;
     private final ShowWhen showWhen;
 
-    public CompassManager(ShowCoords showCoords, ShowWhen showWhen) {
-        this.showCoords = showCoords;
+    public CompassManager(String showCoordsPattern, ShowWhen showWhen) {
+        /* Available placeholders for showCoordsPattern: {TARGET}, {OWNER}, {X}, {Y}, {Z}, {DISTANCE} */
+        this.showCoordsPattern = showCoordsPattern;
         this.showWhen = showWhen;
         
         GameLib gameLib = GameLib.getInstance();
@@ -57,9 +58,9 @@ public class CompassManager implements Listener {
         });
     }
 
-    public CompassManager(ShowCoords showCoords) {this(showCoords, ShowWhen.IN_INVENTORY);}
+    public CompassManager(String showCoordsPattern) {this(showCoordsPattern, ShowWhen.IN_INVENTORY);}
 
-    public CompassManager() {this(ShowCoords.ALL, ShowWhen.IN_INVENTORY);}
+    public CompassManager() {this("§7Tracking §a{TARGET} §7at §f{X} {Y} {Z}", ShowWhen.IN_INVENTORY);}
 
     public static CompassManager getInstance() {return instance;}
 
@@ -114,12 +115,17 @@ public class CompassManager implements Listener {
         int x = loc.getBlockX();
         int y = loc.getBlockY();
         int z = loc.getBlockZ();
+        double distance = Math.round(player.getLocation().distance(loc));
 
-        switch (showCoords) {
-            case ALL ->  Chat.actionBar(player, " §7Tracking §a" + trackedPlayer.getName() + " §7at §f" + x + " " + y + " " + z);
-            case Y ->    Chat.actionBar(player, " §7Tracking §a" + trackedPlayer.getName() + " §7at §fy " + y);
-            case NONE -> {}
-        }
+        String message = showCoordsPattern
+            .replace("{TARGET}", trackedPlayer.getName())
+            .replace("{OWNER}", player.getName())
+            .replace("{X}", String.valueOf(x))
+            .replace("{Y}", String.valueOf(y))
+            .replace("{Z}", String.valueOf(z))
+            .replace("{DISTANCE}", String.valueOf((int) distance));
+
+        Chat.actionBar(player, message);
 
         return true;
     }
@@ -127,6 +133,10 @@ public class CompassManager implements Listener {
     public void update() {
         for (Player player : Bukkit.getOnlinePlayers()) {
             Inventory inventory = player.getInventory();
+
+            for (TrackingCompass compass : activeCompasses.values()) {
+                compass.updateDirection(player);
+            }
 
             switch (showWhen) {
                 case IN_INVENTORY -> {
