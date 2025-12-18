@@ -295,7 +295,7 @@ public class ItemLoader {
     }
 
     private static Enchantment getEnchantmentByName(String name) {
-        NamespacedKey key = Chat.namespacedKey(name.toLowerCase());
+        NamespacedKey key = Chat.namespacedKey(name.toLowerCase(), true);
         Registry<Enchantment> registry = RegistryAccess.registryAccess().getRegistry(RegistryKey.ENCHANTMENT);
         return registry.get(key);
     }
