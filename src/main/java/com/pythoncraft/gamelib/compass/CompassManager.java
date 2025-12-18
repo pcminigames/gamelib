@@ -60,7 +60,9 @@ public class CompassManager implements Listener {
 
     public CompassManager(String showCoordsPattern) {this(showCoordsPattern, ShowWhen.IN_INVENTORY);}
 
-    public CompassManager() {this("§7Tracking §a{TARGET} §7at §f{X} {Y} {Z}", ShowWhen.IN_INVENTORY);}
+    public CompassManager(ShowWhen showWhen) {this("§7Tracking §a{TARGET} §7at §f{X} {Y} {Z}", showWhen);}
+
+    public CompassManager() {this(ShowWhen.IN_INVENTORY);}
 
     public static CompassManager getInstance() {return instance;}
 

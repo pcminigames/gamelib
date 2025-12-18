@@ -1,5 +1,7 @@
 package com.pythoncraft.gamelib;
 
+import java.util.HashSet;
+
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 
@@ -38,16 +40,26 @@ public class Chat {
         player.sendActionBar(component(message));
     }
 
-    public static Component component(String message) {
-        return Component.text(c(message));
+    public static void actionBar(HashSet<Player> players, String message) {
+        for (Player player : players) {actionBar(player, message);}
     }
+
+    public static void message(Player player, String message) {
+        player.sendMessage(c(message));
+    }
+
+    public static void message(HashSet<Player> players, String message) {
+        for (Player player : players) {message(player, message);}
+    }
+
+
 
     public static String string(Component component) {
         return PlainTextComponentSerializer.plainText().serialize(component);
     }
 
-    public static void message(Player player, String message) {
-        player.sendMessage(c(message));
+    public static Component component(String message) {
+        return Component.text(c(message));
     }
 
     public static NamespacedKey namespacedKey(String key, boolean isMinecraftKey) {

@@ -59,6 +59,7 @@ public class TrackingCompass {
     }
 
     public void updateDirection(Player player) {
+        if (this.trackedPlayer == null || !this.trackedPlayer.isOnline()) {return;}
         this.itemMeta.setLodestoneTracked(false);
         this.itemMeta.setLodestone(trackedPlayer.getLocation());
         

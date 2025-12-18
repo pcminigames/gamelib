@@ -26,6 +26,7 @@ import org.bukkit.potion.PotionEffectType;
 
 import com.pythoncraft.gamelib.Chat;
 import com.pythoncraft.gamelib.GameLib;
+import com.pythoncraft.gamelib.Logger;
 
 import io.papermc.paper.registry.RegistryAccess;
 import io.papermc.paper.registry.RegistryKey;
@@ -265,8 +266,15 @@ public class ItemLoader {
                 int duration = effectSection.getInt("duration", 0);
                 int amplifier = effectSection.getInt("amplifier", 0);
                 boolean hide = effectSection.getBoolean("hide", false);
+                Logger.info("Loading potion effect: {0}", effectName);
 
-                PotionEffect effect = new PotionEffect(getPotionEffectTypeByName(effectName), duration, amplifier, false, hide);
+                PotionEffectType effectType = getPotionEffectTypeByName(effectName);
+                if (effectType == null) {
+                    Logger.error("Unknown potion effect type: {0}", effectName);
+                    continue;
+                }
+                
+                PotionEffect effect = new PotionEffect(effectType, duration, amplifier, false, hide);
                 potionEffects.add(effect);
             }
         }
@@ -293,7 +301,7 @@ public class ItemLoader {
     }
 
     private static PotionEffectType getPotionEffectTypeByName(String name) {
-        NamespacedKey key = Chat.namespacedKey(name.toLowerCase());
+        NamespacedKey key = Chat.namespacedKey(name.toLowerCase(), true);
         Registry<PotionEffectType> registry = RegistryAccess.registryAccess().getRegistry(RegistryKey.MOB_EFFECT);
         return registry.get(key);
     }
