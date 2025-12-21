@@ -6,7 +6,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 import com.pythoncraft.gamelib.Logger;
-import com.pythoncraft.gamelib.inventory.order.InventoryOrder;
 
 public class Kit {
     public String displayName;
@@ -19,7 +18,7 @@ public class Kit {
         this.items = items;
     }
 
-    public void give(Player player, InventoryOrder inventoryOrder) {
+    public void give(Player player, InventoryLayout inventoryOrder) {
         for (String slotName : items.keySet()) {
             if (inventoryOrder.hasSlot(slotName)) {
                 int slot = inventoryOrder.getSlot(slotName);
@@ -31,6 +30,6 @@ public class Kit {
     }
 
     public void give(Player player) {
-        give(player, InventoryOrder.get(player));
+        give(player, InventoryLayout.get(player));
     }
 }

@@ -2,6 +2,7 @@ package com.pythoncraft.gamelib;
 
 import java.util.HashSet;
 
+import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 
@@ -50,6 +51,10 @@ public class Chat {
 
     public static void message(HashSet<Player> players, String message) {
         for (Player player : players) {message(player, message);}
+    }
+
+    public static void broadcast(String message) {
+        Bukkit.getServer().broadcast(component(message));
     }
 
 

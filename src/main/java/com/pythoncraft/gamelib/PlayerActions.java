@@ -57,6 +57,10 @@ public class PlayerActions {
             setGamemode(player, GameMode.SURVIVAL);
             setInertFalse(player);
             clearEffects(player);
+            resetHealth(player);
+            resetHunger(player);
+            clearXp(player);
+            clearEnderChest(player);
 
             if (effects != null) {
                 for (PotionEffect effect : effects) {
