@@ -18,13 +18,14 @@ public class Kit {
         this.items = items;
     }
 
-    public void give(Player player, InventoryLayout inventoryOrder) {
+    public void give(Player player, InventoryLayout inventoryLayout) {
         for (String slotName : items.keySet()) {
-            if (inventoryOrder.hasSlot(slotName)) {
-                int slot = inventoryOrder.getSlot(slotName);
+            if (inventoryLayout.hasSlot(slotName)) {
+                int slot = inventoryLayout.getSlot(slotName);
                 player.getInventory().setItem(slot, items.get(slotName).getFor(player));
             } else {
-                Logger.warn("Slot name '{0}' not found in inventory order '{1}' for player {2}. Skipping item.", slotName, inventoryOrder.name, player.getName());
+                Logger.warn("Slot name "  + slotName + " not found in inventory layout " + inventoryLayout.name + " for player " + player.getName() + ". Skipping item.");
+                Logger.warn("Available slots: " + String.join(", ", inventoryLayout.slots.keySet()));
             }
         }
     }

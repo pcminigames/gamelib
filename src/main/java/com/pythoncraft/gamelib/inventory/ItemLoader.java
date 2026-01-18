@@ -190,7 +190,7 @@ public class ItemLoader {
         }
 
         if (durability != null) {
-            if (durability == 0) {
+            if (durability <= 0) {
                 itemMeta.setUnbreakable(true);
                 itemMeta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
             } else if (itemMeta instanceof Damageable damageable) {

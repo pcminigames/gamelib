@@ -19,10 +19,8 @@ public class InventoryLayout {
         this.name = name;
     }
 
-    public void addSlot(String slotName, int slotIndex) {
-        if (slots.containsKey(slotName)) {
-            throw new IllegalArgumentException("Slot name '" + slotName + "' already exists in the inventory layout.");
-        }
+    public void mapSlot(String slotName, int slotIndex) {
+        if (slots.containsKey(slotName)) {return;}
         
         slots.put(slotName, slotIndex);
     }
@@ -41,7 +39,7 @@ public class InventoryLayout {
 
     public static InventoryLayout get(String playerName) {
         if (!playerLayouts.containsKey(playerName)) {
-            throw new IllegalArgumentException("No inventory layout found for player: " + playerName);
+            return layouts.get("default");
         }
 
         return layouts.get(playerLayouts.get(playerName));
