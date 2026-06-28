@@ -7,6 +7,7 @@ import org.bukkit.event.player.PlayerMoveEvent;
 
 import java.io.File;
 import java.util.HashSet;
+import java.util.List;
 import java.util.function.BiConsumer;
 
 import org.bukkit.Bukkit;
@@ -34,7 +35,7 @@ public class GameManager implements Listener {
     public int gap = 6000;
     public int currentGame = 0;
     public int nextGame = 1;
-    public HashSet<String> avoidedBiomes;
+    public HashSet<String> avoidedBiomes = new HashSet<>();
     public boolean gracePeriodPVP = false;
 
     public int borderSize = 400; // 0 means no border
@@ -109,6 +110,10 @@ public class GameManager implements Listener {
         this.avoidedBiomes = avoidedBiomes;
     }
 
+    public void setAvoidedBiomes(List<String> avoidedBiomes) {
+        this.avoidedBiomes = new HashSet<>(avoidedBiomes);
+    }
+
     public void setPlayerSetupMethod(BiConsumer<Player, HashSet<Player>> onPrepareStart, BiConsumer<Player, HashSet<Player>> onGameStart) {
         this.onPrepareStart = onPrepareStart;
         this.onPrepareEnd = onGameStart;
@@ -176,6 +181,9 @@ public class GameManager implements Listener {
                 border.setWarningDistance(this.borderWarnDistance);
             }
     
+            Location loc = new Location(world, this.x + 0.5, this.y + 1.09375, this.z + 0.5);
+            world.setSpawnLocation(loc);
+            
             for (Player player : playersInGame) {
                 if (this.onPrepareStart != null) {
                     this.onPrepareStart.accept(player, playersInGame);
@@ -183,7 +191,8 @@ public class GameManager implements Listener {
     
                 this.bossbar.addPlayer(player);
     
-                player.teleport(new Location(world, this.x + 0.5, this.y + 1.09375, this.z + 0.5));
+                player.teleport(loc);
+                player.setRespawnLocation(loc);
             }
         }
 

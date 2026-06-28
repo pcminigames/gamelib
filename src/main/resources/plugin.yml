@@ -1,5 +1,5 @@
 name: "GameLib"
-version: "4.0"
+version: "4.2"
 main: "com.pythoncraft.gamelib.GameLib"
 api-version: "1.21"
 authors: [pythoncraft]

@@ -13,15 +13,19 @@ public class Score {
     private static Scoreboard scoreboard = GameLib.getInstance().getServer().getScoreboardManager().getMainScoreboard();
     private Objective objective;
 
-    public Score(String name, String displayName) {
+    public Score(String name, Criteria criteria, String displayName) {
         if (scoreboard.getObjective(name) != null) {
             scoreboard.getObjective(name).unregister();
         }
-        this.objective = scoreboard.registerNewObjective(name, Criteria.DUMMY, Chat.c(displayName));
+        this.objective = scoreboard.registerNewObjective(name, criteria, Chat.c(displayName));
     }
 
     public Score(String name) {
-        this(name, name);
+        this(name, Criteria.DUMMY, name);
+    }
+
+    public Score(String name, String displayName) {
+        this(name, Criteria.DUMMY, displayName);
     }
 
     public void setDisplayName(String displayName) {

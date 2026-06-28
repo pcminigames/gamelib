@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
 import net.md_5.bungee.api.ChatMessageType;
@@ -43,20 +44,40 @@ public class Chat {
         player.spigot().sendMessage(ChatMessageType.ACTION_BAR, component(message));
     }
 
-    public static void actionBar(Iterable<Player> players, String message) {
+    public static void actionBar(Iterable<? extends Player> players, String message) {
         for (Player player : players) {actionBar(player, message);}
+    }
+
+    public static void actionBar(String message) {
+        actionBar(Bukkit.getServer().getOnlinePlayers(), message);
     }
 
     public static void message(Player player, String message) {
         player.sendMessage(c(message));
     }
 
-    public static void message(Iterable<Player> players, String message) {
+    public static void message(Iterable<? extends Player> players, String message) {
         for (Player player : players) {message(player, message);}
+    }
+
+    public static void message(String message) {
+        message(Bukkit.getServer().getOnlinePlayers(), message);
     }
 
     public static void broadcast(String message) {
         Bukkit.getServer().broadcast(message, "*");
+    }
+
+    public static void playSound(Player player, Sound sound, float volume, float pitch) {
+        player.playSound(player.getLocation(), sound, volume, pitch);
+    }
+
+    public static void playSound(Iterable<? extends Player> players, Sound sound, float volume, float pitch) {
+        for (Player player : players) {playSound(player, sound, volume, pitch);}
+    }
+
+    public static void playSound(Sound sound, float volume, float pitch) {
+        playSound(Bukkit.getServer().getOnlinePlayers(), sound, volume, pitch);
     }
 
 
